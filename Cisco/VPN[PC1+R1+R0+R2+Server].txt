@@ -56,11 +56,6 @@ ip route 10.1.1.0 255.255.255.252 fast 0/0
 
 
  
-en
-conf t
-int giga0/0
-ip add 10.1.1.1
-
 
 
 #R1
