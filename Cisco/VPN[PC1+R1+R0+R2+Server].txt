@@ -1,0 +1,117 @@
+#Router1
+
+en
+conf t
+int fast 0/1
+ip add 192.168.1.254 255.255.255.0
+no sh
+int fast 0/0
+ip add 10.1.1.1 255.255.255.252
+no sh
+exit
+ip route 10.2.2.0 255.255.255.252 fast 0/0
+end
+wr
+
+#Router0
+
+en
+conf t
+int fast  0/0
+ip add 10.1.1.2 255.255.255.252
+no sh
+int fast 0/1 
+ip add 10.2.2.2 255.255.255.252
+no sh
+end
+wr
+
+#Router2
+
+en
+conf t
+int fast 0/1
+ip add 192.168.3.254 255.255.255.0
+no sh
+int fast 0/0
+ip add 10.2.2.1 255.255.255.252
+no sh
+exit
+ip route 10.1.1.0 255.255.255.252 fast 0/0
+end
+wr
+
+
+#Router1
+en 
+conf t
+ip route 10.2.2.0 255.255.255.252 fast 0/0
+
+
+#Router2
+en 
+conf t
+ip route 10.1.1.0 255.255.255.252 fast 0/0
+
+
+
+ 
+en
+conf t
+int giga0/0
+ip add 10.1.1.1
+
+
+
+#R1
+
+en
+conf t
+crypto isakmp policy 10
+authentication pre-share
+encryption 3des
+hash md5
+lifetime 3600
+exit
+crypto isakmp key cisco address 10.2.2.1
+crypto ipsec transform-set 50 esp-3des esp-md5-hmac
+crypto ipsec security-association lifetime seconds 1800
+access-list 101 permit ip 192.168.1.0 0.0.0.255 192.168.3.0 0.0.0.255
+crypto map test 10 ipsec-isakmp 
+set peer 10.2.2.1
+set transform-set 50
+set security-association lifetime seconds 900
+match address 101
+exit
+int fast0/0
+crypto map test
+end
+wr
+
+#R2
+
+
+en
+conf t
+crypto isakmp policy 10
+authentication pre-share
+encryption 3des
+hash md5
+lifetime 3600
+exit
+crypto isakmp key cisco address 10.1.1.1
+crypto ipsec transform-set 50 esp-3des esp-md5-hmac
+crypto ipsec security-association lifetime seconds 1800
+access-list 101 permit ip 192.168.1.0 0.0.0.255 192.168.3.0 0.0.0.255
+crypto map test 10 ipsec-isakmp 
+set peer 10.1.1.1
+set transform-set 50
+set security-association lifetime seconds 900
+match address 101
+exit
+int fast0/0
+crypto map test
+end
+wr
+
+

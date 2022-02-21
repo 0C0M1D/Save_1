@@ -1,0 +1,48 @@
+R1#
+en
+conf t
+int fast0/0
+ip add 10.1.1.1 255.255.255.0
+no sh
+exit
+int fast0/1
+ip add 1.1.1.1 255.255.255.0
+no sh
+exit
+ip route 2.1.1.0 0.0.0.255 fast0/0
+end
+wr
+
+#R2#
+en
+conf t
+int fast0/0
+ip add 10.1.1.2 255.255.255.0
+no sh
+exit
+int fast0/1
+ip add 2.1.1.1 255.255.255.0
+no sh
+ip route 1.1.1.0 0.0.0.255 fast0/0
+end
+wr
+
+#PC1# -- terminale CMD
+
+[
+IP : 1.1.1.2
+ntm : 255.255.255.0
+]
+ping 10.1.1.2
+ping 2.1.1.2
+
+#PC2# -- terminale CMD
+
+[
+IP : 2.1.1.2
+ntm : 255.255.255.0
+]
+
+ping 10.1.1.1
+ping 1.1.1.2
+
